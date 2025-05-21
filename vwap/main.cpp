@@ -1,26 +1,25 @@
-#include "vwap.cpp"
+#include "vwap.hpp"
 
 #include <iostream>
 
 #define DEFAULT_WINDOW_TIME 30
 #define DEFAULT_SIMULATION_TIME 50
 
-int currentTimestamp = 0;
-
-TickData generateRandomTick()
+TickData<double> generateRandomTick(int &currentTime)
 {
     double price{0};
     int volume{0};
-    std::cout << "Price(" << ++currentTimestamp << "): ";
+    std::cout << "Price(" << ++currentTime << "): ";
     std::cin >> price;
-    std::cout << "Volume(" << currentTimestamp << "): ";
+    std::cout << "Volume(" << currentTime << "): ";
     std::cin >> volume;
-    return TickData{price, volume, currentTimestamp};
+    return TickData<double>{price, volume, currentTime};
 }
 
 int main()
 {
     std::cout << "VWAP Calculator" << std::endl;
+    int currentTime = 0;
     int windowTime = DEFAULT_WINDOW_TIME;
     int simulationTime = DEFAULT_SIMULATION_TIME;
     std::cout << "Window Time (in seconds): ";
@@ -30,13 +29,20 @@ int main()
 
     std::cout << "Simulation Start" << std::endl;
 
-    VWAPCalculator* vWAPCalculator = new VWAPCalculator(windowTime);
+    // VWAPCalculator* vWAPCalculator = new VWAPCalculator(windowTime);
+    VWAPCalculator<double> vWAPCalculator(windowTime);
+    /* or
+    #include <memory>
+    auto vWAPCalculator = std::make_unique<VWAPCalculator>(windowTime);
+    ? only use when dynamic lifetime of object is required.
+    */
 
-    while(simulationTime--)
+    while (simulationTime--)
     {
         std::cout << std::endl;
-        vWAPCalculator->insertTick(generateRandomTick());
-        std::cout << "Current VWAP: " << vWAPCalculator->getVWAP() << std::endl << std::endl;
+        vWAPCalculator.insertTick(generateRandomTick(currentTime));
+        std::cout << "Current VWAP: " << vWAPCalculator.getVWAP() << std::endl
+                  << std::endl;
     }
 
     std::cout << "Simulation End" << std::endl;
