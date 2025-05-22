@@ -7,6 +7,8 @@
 #define DEFAULT_WINDOW_TIME 30
 #define DEFAULT_SIMULATION_TIME 50
 
+/* Flags to use while compiling and linking: -O3 -flto */
+
 template <typename PriceType>
 __forceinline TickData<PriceType> generateSyntheticTick(int currentTime)
 {
