@@ -1,5 +1,6 @@
 #include "vwap.hpp"
 
+#include <windows.h>
 #include <iostream>
 #include <x86intrin.h> //? For __rdtsc (works with GCC/Clang on x86/x64)
 
@@ -7,9 +8,9 @@
 #define DEFAULT_SIMULATION_TIME 50
 
 template <typename PriceType>
-TickData<PriceType> generateSyntheticTick(int currentTime)
+__forceinline TickData<PriceType> generateSyntheticTick(int currentTime)
 {
-    return TickData<PriceType>(static_cast<PriceType>(100.0 + (currentTime % 10)), 1 + (currentTime % 5), currentTime);
+    return TickData<PriceType>(static_cast<PriceType>(100.0 + (currentTime & 0xF)), 1 + (currentTime % 5), currentTime);
 }
 
 int main()
