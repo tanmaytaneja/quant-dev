@@ -5,15 +5,16 @@
 #define DEFAULT_WINDOW_TIME 30
 #define DEFAULT_SIMULATION_TIME 50
 
-TickData<double> generateRandomTick(int &currentTime)
+template <typename PriceType>
+TickData<PriceType> generateRandomTick(int &currentTime)
 {
-    double price{0};
+    PriceType price{0};
     int volume{0};
     std::cout << "Price(" << ++currentTime << "): ";
     std::cin >> price;
     std::cout << "Volume(" << currentTime << "): ";
     std::cin >> volume;
-    return TickData<double>{price, volume, currentTime};
+    return TickData<PriceType>{price, volume, currentTime};
 }
 
 int main()
@@ -29,7 +30,6 @@ int main()
 
     std::cout << "Simulation Start" << std::endl;
 
-    // VWAPCalculator* vWAPCalculator = new VWAPCalculator(windowTime);
     VWAPCalculator<double> vWAPCalculator(windowTime);
     /* or
     #include <memory>
@@ -40,7 +40,7 @@ int main()
     while (simulationTime--)
     {
         std::cout << std::endl;
-        vWAPCalculator.insertTick(generateRandomTick(currentTime));
+        vWAPCalculator.insertTick(generateRandomTick<double>(currentTime));
         std::cout << "Current VWAP: " << vWAPCalculator.getVWAP() << std::endl
                   << std::endl;
     }

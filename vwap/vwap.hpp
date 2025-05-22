@@ -8,7 +8,7 @@
 template <typename PriceType>
 struct alignas(16) TickData // TODO: struct cache aligning
 {
-    double price;
+    PriceType price;
     int volume;
     int timestamp;
     // static_assert(sizeof(TickData<PriceType>) == 16, "struct TickData<PriceType> is not tightly packed!");
