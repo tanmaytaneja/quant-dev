@@ -45,15 +45,13 @@ public:
             const auto &old = tickWindow[head];
             VWAPSum -= old.price * old.volume;
             totalVolume -= old.volume;
-            head++;
-            head %= MAX_TICKS;
+            head = (head + 1) & MAX_TICKS;
             --size;
         }
         tickWindow[tail] = tickData;
         VWAPSum += tickData.price * tickData.volume;
         totalVolume += tickData.volume;
-        ++tail;
-        tail %= MAX_TICKS;
+        tail = (tail + 1) & MAX_TICKS;
         ++size;
 #endif
     }

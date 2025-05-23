@@ -44,10 +44,9 @@ int main()
     unsigned long long end = __rdtsc();
 
     std::cout << "Final VWAP: " << vWAPCalculator.getVWAP() << std::endl;
-    std::cout << "Total CPU Cycles: " << end - start << std::endl;
-    std::cout << "Average CPU Cycles per insertTick(): " << (end - start) / NUM_TICKS << std::endl;
+    std::cout << "Total CPU Cycles (for generateSyntheticTick + insertTick): " << end - start << std::endl;
+    std::cout << "Average CPU Cycles per (generateSyntheticTick + insertTick): " << (end - start) / NUM_TICKS << std::endl;
     std::cout << std::endl;
-
     std::cout << "Simulation End" << std::endl;
 
     return 0;
