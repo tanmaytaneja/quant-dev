@@ -64,7 +64,7 @@ public:
     VWAPCalculator(int windowSeconds)
         : windowSeconds{windowSeconds}, VWAPSum{0}, totalVolume{0}, head{0}, tail{0}, size{0}
     {
-        // TODO: tickWindow queue resizing ?? it's according to timestamp though, so maybe size can be indefinite?
+        // TODO: tickWindow resizing ?? it's according to timestamp though, so maybe size can be indefinite?
     }
 
     VWAPCalculator(const VWAPCalculator &) = delete;
