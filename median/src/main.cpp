@@ -1,6 +1,5 @@
 #include "median.hpp"
 
-#include <windows.h>
 #include <iostream>
 #include <x86intrin.h> //? For __rdtsc (works with GCC/Clang on x86/x64)
 

@@ -1,15 +1,22 @@
 #ifndef MEDIAN_HPP
 #define MEDIAN_HPP
 
-#include "ring-buffer.hpp"
-#include "macros.hpp"
+#define CUSTOM_SORTED_ARRAY 0
 
-#include <queue>
+#include "macros.hpp"
+#include "ring-buffer.hpp"
+
+#if CUSTOM_SORTED_ARRAY == 1
+#define USE_SET_EXTRACT 0
+#include "sorted-array.hpp"
+#else
+#define USE_SET_EXTRACT 1
 #include <set>
+#endif
 
 /* 16 Bytes */
 template <typename PriceType>
-struct alignas(32) Tick // TODO: struct cache aligning
+struct Tick // TODO: struct cache aligning
 {
     PriceType price;
     int volume;
@@ -23,6 +30,11 @@ struct alignas(32) Tick // TODO: struct cache aligning
     {
         return price < other.price || (price == other.price && timestamp < other.timestamp);
     }
+
+    bool operator==(const Tick &other) const
+    {
+        return /* price == other.price && volume == other.volume && */ timestamp == other.timestamp;
+    }
 };
 
 template <typename PriceType>
@@ -32,12 +44,16 @@ public:
     MedianCalculator(int windowSeconds)
         : windowSeconds{windowSeconds}, cumulativeLowerVolume{0}, cumulativeUpperVolume{0}, cumulativeVolume{0}
     {
-        //TODO: Constructor shit
+        // TODO: Constructor shit
     }
 
     FORCE_INLINE void removeTick(const Tick<PriceType> &tick)
     {
         cumulativeVolume -= tick.volume;
+#if CUSTOM_SORTED_ARRAY == 1
+        
+#else
+#endif
         if (upperTicks.find(tick) == upperTicks.end())
         {
             //? implies lower tick
@@ -48,7 +64,7 @@ public:
         {
             //? implies upper tick
             cumulativeUpperVolume -= tick.volume;
-            upperTicks.erase(tick);
+            upperTicks.erase(tick); //! Does this waste extra time? Can we just search up the iterator once?
         }
         ticks.pop();
     }
@@ -90,15 +106,22 @@ public:
     {
         while (cumulativeLowerVolume < ((cumulativeVolume + 1) >> 1))
         {
+#if USE_SET_EXTRACT == 1
+            auto upperTick = upperTicks.extract(upperTicks.begin());
+            cumulativeUpperVolume -= upperTick.value().volume;
+            cumulativeLowerVolume += upperTick.value().volume;
+            lowerTicks.insert(std::move(upperTick));
+#else
             auto upperTick = upperTicks.begin();
             upperTicks.erase(upperTick);
             cumulativeUpperVolume -= upperTick->volume;
             lowerTicks.insert(*upperTick);
             cumulativeLowerVolume += upperTick->volume;
+#endif
         }
     }
 
-    PriceType getMedian() const
+    FORCE_INLINE PriceType getMedian() const
     {
         return std::prev(lowerTicks.end())->price;
     }
@@ -112,12 +135,15 @@ private:
     int cumulativeLowerVolume;
     int cumulativeUpperVolume;
     int cumulativeVolume;
-    // std::queue<Tick<PriceType>> ticks;
     static constexpr size_t MAX_TICKS = 4096;
     RingBuffer<Tick<PriceType>, MAX_TICKS> ticks;
-    //! need to store the cumulative volume on both sides. Can be a little complex.
+#if CUSTOM_SORTED_ARRAY == 1
+    SortedArray<Tick<PriceType>, MAX_TICKS> lowerTicks;
+    SortedArray<Tick<PriceType>, MAX_TICKS> upperTicks;
+#else
     std::set<Tick<PriceType>> lowerTicks;
     std::set<Tick<PriceType>> upperTicks;
+#endif
 };
 
 #endif
