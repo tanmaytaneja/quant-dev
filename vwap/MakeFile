@@ -1,5 +1,5 @@
 CXX = g++
-CXX_FLAGS = -O3 -flto -I../utils
+CXX_FLAGS = -O3 -flto -fomit-frame-pointer -fno-rtti -I../utils
 
 SRC = src/main.cpp
 OUT = build/vwap.exe
