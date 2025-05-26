@@ -1,14 +1,15 @@
 #ifndef VWAP_HPP
 #define VWAP_HPP
 
-#define TICK_WINDOW_QUEUE 0
+#define CUSTOM_RING_BUFFER 1
 
 #include "macros.hpp"
-#include "ring-buffer.hpp"
 
 #include <iostream>
 
-#if TICK_WINDOW_QUEUE == 1
+#if CUSTOM_RING_BUFFER == 1
+#include "ring-buffer.hpp"
+#else
 #include <queue>
 #endif
 
@@ -64,10 +65,10 @@ private:
     int windowSeconds;
     double VWAPSum;
     int totalVolume;
-#if TICK_WINDOW_QUEUE == 1
-    std::queue<TickData<PriceType>> tickWindow; //! Never use std::queue in HFT since it is backed by std::deque, this causes dynamic allocations and non-contiguous memory.
+#if CUSTOM_RING_BUFFER == 1
+    RingBuffer<TickData<PriceType>, MAX_TICKS> tickWindow; //? Use this instead. This represents a ring-buffer. It offers us ZERO dynamic memory allocations, constant time push/pop and predictable memory layout.
 #else
-    RingBuffer<TickData<PriceType>, MAX_TICKS>tickWindow; //? Use this instead. This represents a ring-buffer. It offers us ZERO dynamic memory allocations, constant time push/pop and predictable memory layout.
+    std::queue<TickData<PriceType>> tickWindow; //! Never use std::queue in HFT since it is backed by std::deque, this causes dynamic allocations and non-contiguous memory.
 #endif
 };
 
