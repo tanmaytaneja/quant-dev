@@ -1,0 +1,9 @@
+CXX = g++
+CXX_FLAGS = -O3 -flto -I../utils
+
+SRC = src/main.cpp
+OUT = virtual.exe
+# OUT = crtp.exe
+
+all:
+	$(CXX) $(CXX_FLAGS) $(SRC) -o $(OUT)

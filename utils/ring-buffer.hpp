@@ -77,7 +77,7 @@ public:
 private:
     static constexpr size_t Capacity = next_power_of_two(RequestedCapacity);
     static constexpr size_t Mask = Capacity - 1;
-    T buffer[Capacity];
+    alignas(32) T buffer[Capacity];
     size_t head;
     size_t tail;
     size_t count;
