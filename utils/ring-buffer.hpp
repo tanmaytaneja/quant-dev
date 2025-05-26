@@ -60,7 +60,7 @@ public:
     FORCE_INLINE void push(const T&& item)
     {
         buffer[tail] = std::move(item);
-        tail = (tail + 1) & mask;
+        tail = (tail + 1) & Mask;
         ++count;
     }
 
@@ -91,6 +91,7 @@ private:
 
 #endif
 
+//* Instead of std::string, use char[N] or std::array<char, N> or custom SSO strings.
 //! What are SSO strings?
 
 //* Can remove count, since head - tail is the same thing. Moreover, the 'count' variable can be placed in a different cache line, which is more latency sensitive compared to subtraction (head - tail).
