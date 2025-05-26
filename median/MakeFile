@@ -1,8 +1,9 @@
 CXX = g++
-CXXFLAGS = -O3 -flto
+# CXX_FLAGS = -O3 -flto -I../utils -fno-exceptions -fprefetch-loop-arrays -fno-rtti -fomit-frame-pointer
+CXX_FLAGS = -O3 -flto -fomit-frame-pointer -fno-rtti -I../utils
 
 SRC = src/main.cpp
 OUT = build/median.exe
 
 all: 
-	$(CXX) $(CXXFLAGS) $(SRC) -o $(OUT)
+	$(CXX) $(CXX_FLAGS) $(SRC) -o $(OUT)

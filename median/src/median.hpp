@@ -1,7 +1,8 @@
 #ifndef MEDIAN_HPP
 #define MEDIAN_HPP
 
-#include "../../utils/ring-buffer.hpp"
+#include "ring-buffer.hpp"
+#include "macros.hpp"
 
 #include <queue>
 #include <set>
@@ -34,7 +35,7 @@ public:
         //TODO: Constructor shit
     }
 
-    __forceinline void removeTick(const Tick<PriceType> &tick)
+    FORCE_INLINE void removeTick(const Tick<PriceType> &tick)
     {
         cumulativeVolume -= tick.volume;
         if (upperTicks.find(tick) == upperTicks.end())
@@ -52,7 +53,7 @@ public:
         ticks.pop();
     }
 
-    __forceinline void insertTick(const Tick<PriceType> &tick)
+    FORCE_INLINE void insertTick(const Tick<PriceType> &tick)
     {
         int currentTime = tick.timestamp;
         //? remove all ticks with timestamp less than N minutes from currentTime;
@@ -85,7 +86,7 @@ public:
         balanceTicks();
     }
 
-    __forceinline void balanceTicks()
+    FORCE_INLINE void balanceTicks()
     {
         while (cumulativeLowerVolume < ((cumulativeVolume + 1) >> 1))
         {
