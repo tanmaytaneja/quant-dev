@@ -16,7 +16,7 @@ static constexpr int MAX_TICKS = 1024;
 
 /* 16 Bytes */
 template <typename PriceType>
-struct alignas(32) TickData // TODO: struct cache aligning
+struct /* alignas(32) */ TickData // TODO: struct cache aligning
 {
     PriceType price;
     int volume;
