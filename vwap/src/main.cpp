@@ -7,10 +7,8 @@
 #define DEFAULT_WINDOW_TIME 30
 #define DEFAULT_SIMULATION_TIME 50
 
-/* Flags to use while compiling and linking: -O3 -flto */
-
 template <typename PriceType>
-__forceinline TickData<PriceType> generateSyntheticTick(int currentTime)
+FORCE_INLINE TickData<PriceType> generateSyntheticTick(int currentTime)
 {
     return TickData<PriceType>(static_cast<PriceType>(100.0 + (currentTime & 0xF)), 1 + (currentTime % 5), currentTime);
 }
@@ -27,11 +25,6 @@ int main()
     std::cout << std::endl;
 
     VWAPCalculator<double> vWAPCalculator(windowTime);
-    /* or
-    #include <memory>
-    auto vWAPCalculator = std::make_unique<VWAPCalculator>(windowTime);
-    ? only use when dynamic lifetime of object is required.
-    */
 
     unsigned long long start = __rdtsc();
 

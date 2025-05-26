@@ -1,0 +1,8 @@
+CXX = g++
+CXX_FLAGS = -O3 -flto
+
+SRC = src/main.cpp
+OUT = build/vwap.exe
+
+add:
+	$(CXX) $(CXX_FLAGS) $(SRC) -o $(OUT)

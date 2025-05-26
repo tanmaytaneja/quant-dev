@@ -3,8 +3,13 @@
 
 #define TICK_WINDOW_QUEUE 0
 
+#include "../../utils/macros.hpp"
+
 #include <iostream>
+
+#if TICK_WINDOW_QUEUE == 1
 #include <queue>
+#endif
 
 static constexpr int MAX_TICKS = 1024;
 static constexpr int TICK_MASK = MAX_TICKS - 1; //? Ensure MAX_TICKS is a power of 2
@@ -26,7 +31,7 @@ template <typename PriceType>
 class VWAPCalculator
 {
 public:
-    __forceinline void insertTick(const TickData<PriceType> &tickData)
+    FORCE_INLINE void insertTick(const TickData<PriceType> &tickData)
     {
 #if TICK_WINDOW_QUEUE == 1
         while (!tickWindow.empty() && tickData.timestamp - tickWindow.front().timestamp >= windowSeconds)
@@ -56,7 +61,7 @@ public:
 #endif
     }
 
-    __forceinline double getVWAP() const
+    FORCE_INLINE double getVWAP() const
     {
         return VWAPSum / totalVolume;
     }
