@@ -1,6 +1,11 @@
 #ifndef MEDIAN_HPP
 #define MEDIAN_HPP
 
+#include "../../utils/ring-buffer.hpp"
+
+#include <queue>
+#include <set>
+
 /* 16 Bytes */
 template <typename PriceType>
 struct alignas(32) Tick // TODO: struct cache aligning
@@ -12,6 +17,11 @@ struct alignas(32) Tick // TODO: struct cache aligning
     Tick() = default; //? Required when this struct is part of an array!
     Tick(PriceType price, int volume, int timestamp)
         : price{price}, volume{volume}, timestamp{timestamp} {}
+
+    bool operator<(const Tick &other) const
+    {
+        return price < other.price || (price == other.price && timestamp < other.timestamp);
+    }
 };
 
 template <typename PriceType>
@@ -21,6 +31,7 @@ public:
     MedianCalculator(int windowSeconds)
         : windowSeconds{windowSeconds}, cumulativeLowerVolume{0}, cumulativeUpperVolume{0}, cumulativeVolume{0}
     {
+        //TODO: Constructor shit
     }
 
     __forceinline void removeTick(const Tick<PriceType> &tick)
@@ -38,7 +49,7 @@ public:
             cumulativeUpperVolume -= tick.volume;
             upperTicks.erase(tick);
         }
-        ticks.erase(tick);
+        ticks.pop();
     }
 
     __forceinline void insertTick(const Tick<PriceType> &tick)
@@ -58,7 +69,7 @@ public:
             }
         }
 
-        if (cumulativeLowerVolume && tick.price > *lowerTicks.end()->price)
+        if (cumulativeLowerVolume && tick.price > std::prev(lowerTicks.end())->price)
         {
             upperTicks.insert(tick);
             cumulativeUpperVolume += tick.volume;
@@ -76,19 +87,19 @@ public:
 
     __forceinline void balanceTicks()
     {
-        while (cumulativeLowerVolume < (cumulativeVolume >> 1))
+        while (cumulativeLowerVolume < ((cumulativeVolume + 1) >> 1))
         {
             auto upperTick = upperTicks.begin();
             upperTicks.erase(upperTick);
             cumulativeUpperVolume -= upperTick->volume;
-            lowerTicks.insert(lowerTick);
+            lowerTicks.insert(*upperTick);
             cumulativeLowerVolume += upperTick->volume;
         }
     }
 
-    __forceinline PriceType getMedian() const
+    PriceType getMedian() const
     {
-        return *lowerTicks.end()->price;
+        return std::prev(lowerTicks.end())->price;
     }
 
     MedianCalculator(const MedianCalculator &) = delete;
@@ -100,7 +111,9 @@ private:
     int cumulativeLowerVolume;
     int cumulativeUpperVolume;
     int cumulativeVolume;
-    std::queue<Tick<PriceType>> ticks;
+    // std::queue<Tick<PriceType>> ticks;
+    static constexpr size_t MAX_TICKS = 4096;
+    RingBuffer<Tick<PriceType>, MAX_TICKS> ticks;
     //! need to store the cumulative volume on both sides. Can be a little complex.
     std::set<Tick<PriceType>> lowerTicks;
     std::set<Tick<PriceType>> upperTicks;
