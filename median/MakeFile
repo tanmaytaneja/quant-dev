@@ -1,0 +1,8 @@
+CXX = g++
+CXXFLAGS = -O3 -flto
+
+SRC = src/main.cpp
+OUT = build/median.exe
+
+all: 
+	$(CXX) $(CXXFLAGS) $(SRC) -o $(OUT)
