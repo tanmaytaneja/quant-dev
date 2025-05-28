@@ -1,7 +1,10 @@
 #ifndef SORTED_ARRAY_HPP
 #define SORTED_ARRAY_HPP
 
+#define SIMD_MEMMOVE 0 //! Taking more time.
+
 #include <cstddef>
+#include <cstring>
 
 template <typename T, size_t Capacity>
 class SortedArray
@@ -35,10 +38,14 @@ public:
     void insert(const T &value) noexcept
     {
         size_t pos = lower_bound(value);
+#if SIMD_MEMMOVE == 1
+        std::memmove(&data[pos + 1], &data[pos], (len - pos) * sizeof(T));
+#else
         for (size_t i = len; i > pos; --i)
         {
             data[i] = data[i - 1];
         }
+#endif
         data[pos] = value;
         ++len;
     }
@@ -104,6 +111,11 @@ public:
         return val;
     }
 
+    void clear() noexcept
+    {
+        len = 0;
+    }
+
 private:
     T data[Capacity];
     size_t len;
@@ -129,7 +141,7 @@ private:
     void print_set() const noexcept
     {
         std::cout << "{ ";
-        for(size_t i = 0; i < len; ++i)
+        for (size_t i = 0; i < len; ++i)
         {
             std::cout << data[i] << ' ';
         }
