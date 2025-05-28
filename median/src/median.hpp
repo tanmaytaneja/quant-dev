@@ -22,16 +22,16 @@ struct Tick // TODO: struct cache aligning
     int volume;
     int timestamp;
 
-    Tick() = default; //? Required when this struct is part of an array!
-    Tick(PriceType price, int volume, int timestamp)
+    Tick() noexcept = default; //? Required when this struct is part of an array!
+    Tick(PriceType price, int volume, int timestamp) noexcept
         : price{price}, volume{volume}, timestamp{timestamp} {}
 
-    bool operator<(const Tick &other) const
+    bool operator<(const Tick &other) const noexcept
     {
         return price < other.price || (price == other.price && timestamp < other.timestamp);
     }
 
-    bool operator==(const Tick &other) const
+    bool operator==(const Tick &other) const noexcept
     {
         return /* price == other.price && volume == other.volume && */ timestamp == other.timestamp;
     }
@@ -53,7 +53,7 @@ public:
         // TODO: Constructor shit
     }
 
-    FORCE_INLINE void removeTick(const Tick<PriceType> &tick)
+    FORCE_INLINE void removeTick(const Tick<PriceType> &tick) noexcept
     {
         cumulativeVolume -= tick.volume;
         if (upperTicks.find(tick) == upperTicks.end())
@@ -71,7 +71,8 @@ public:
         ticks.pop();
     }
 
-    FORCE_INLINE void insertTick(const Tick<PriceType> &tick)
+    //TODO: Add Templatized/Compile-Time Lazy Balancing Option (insert 10K ticks, getMedian once each second)
+    FORCE_INLINE void insertTick(const Tick<PriceType> &tick) noexcept
     {
         int currentTime = tick.timestamp;
         //? remove all ticks with timestamp less than N minutes from currentTime;
@@ -104,7 +105,7 @@ public:
         balanceTicks();
     }
 
-    FORCE_INLINE void balanceTicks()
+    FORCE_INLINE void balanceTicks() noexcept
     {
         while (cumulativeLowerVolume < ((cumulativeVolume + 1) >> 1))
         {
@@ -120,7 +121,7 @@ public:
         }
     }
 
-    FORCE_INLINE PriceType getMedian() const
+    FORCE_INLINE PriceType getMedian() const noexcept
     {
 #if CUSTOM_SORTED_ARRAY == 1
         return lowerTicks.back().price;

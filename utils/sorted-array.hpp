@@ -1,40 +1,38 @@
 #ifndef SORTED_ARRAY_HPP
 #define SORTED_ARRAY_HPP
 
-#define EXTRACT 1
-
 #include <cstddef>
 
 template <typename T, size_t Capacity>
 class SortedArray
 {
 public:
-    SortedArray() : len{0} {}
+    SortedArray() noexcept : len{0} {}
 
-    size_t size() const { return len; }
-    bool empty() const { return len == 0; }
+    size_t size() const noexcept { return len; }
+    bool empty() const noexcept { return len == 0; }
 
-    T &at(size_t i)
+    T &at(size_t i) noexcept
     {
         return data[i];
     }
 
-    const T &at(size_t i) const
+    const T &at(size_t i) const noexcept
     {
         return data[i];
     }
 
-    const T &back() const
+    const T &back() const noexcept
     {
         return data[len - 1];
     }
 
-    T *begin() { return data; }
-    T *end() { return data + len; }
-    const T *begin() const { return data; }
-    const T *end() const { return data + len; }
+    T *begin() noexcept { return data; }
+    T *end() noexcept { return data + len; }
+    const T *begin() const noexcept { return data; }
+    const T *end() const noexcept { return data + len; }
 
-    void insert(const T &value)
+    void insert(const T &value) noexcept
     {
         size_t pos = lower_bound(value);
         for (size_t i = len; i > pos; --i)
@@ -45,7 +43,7 @@ public:
         ++len;
     }
 
-    void erase(const T &value)
+    void erase(const T &value) noexcept
     {
         size_t pos = lower_bound(value);
         if (pos < len && value == data[pos])
@@ -58,7 +56,7 @@ public:
         }
     }
 
-    T *find(const T &value)
+    T *find(const T &value) noexcept
     {
         size_t pos = lower_bound(value);
         if (pos < len && value == data[pos])
@@ -68,7 +66,7 @@ public:
         return end();
     }
 
-    const T *find(const T &value) const
+    const T *find(const T &value) const noexcept
     {
         size_t pos = lower_bound(value);
         if (pos < len && value == data[pos])
@@ -78,8 +76,7 @@ public:
         return end();
     }
 
-#if EXTRACT == 1
-    T extract(T *it)
+    T extract(T *it) noexcept
     {
         size_t pos = it - data;
         T value = data[pos];
@@ -90,13 +87,28 @@ public:
         --len;
         return value;
     }
-#endif
+
+    T pop_back() noexcept
+    {
+        return data[--len];
+    }
+
+    T pop_front() noexcept
+    {
+        T val = data[0];
+        for (size_t i = 1; i < len; ++i)
+        {
+            data[i - 1] = data[i];
+        }
+        --len;
+        return val;
+    }
 
 private:
     T data[Capacity];
     size_t len;
 
-    size_t lower_bound(const T &value) const
+    size_t lower_bound(const T &value) const noexcept
     {
         size_t low = 0, high = len;
         while (low < high)
@@ -114,7 +126,7 @@ private:
         return low;
     }
 
-    void print_set() const
+    void print_set() const noexcept
     {
         std::cout << "{ ";
         for(size_t i = 0; i < len; ++i)
