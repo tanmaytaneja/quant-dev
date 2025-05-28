@@ -1,16 +1,16 @@
 #ifndef MEDIAN_HPP
 #define MEDIAN_HPP
 
-#define CUSTOM_SORTED_ARRAY 0
+#define CUSTOM_SORTED_ARRAY 1
 
 #include "macros.hpp"
 #include "ring-buffer.hpp"
 
+#include <iostream>
+
 #if CUSTOM_SORTED_ARRAY == 1
-#define USE_SET_EXTRACT 0
 #include "sorted-array.hpp"
 #else
-#define USE_SET_EXTRACT 1
 #include <set>
 #endif
 
@@ -38,6 +38,12 @@ struct Tick // TODO: struct cache aligning
 };
 
 template <typename PriceType>
+std::ostream &operator<<(std::ostream &os, const Tick<PriceType> &tick)
+{
+    return os << "[" << tick.price << ", " << tick.volume << ", " << tick.timestamp << "]";
+}
+
+template <typename PriceType>
 class MedianCalculator
 {
 public:
@@ -50,10 +56,6 @@ public:
     FORCE_INLINE void removeTick(const Tick<PriceType> &tick)
     {
         cumulativeVolume -= tick.volume;
-#if CUSTOM_SORTED_ARRAY == 1
-        
-#else
-#endif
         if (upperTicks.find(tick) == upperTicks.end())
         {
             //? implies lower tick
@@ -88,13 +90,13 @@ public:
 
         if (cumulativeLowerVolume && tick.price > std::prev(lowerTicks.end())->price)
         {
-            upperTicks.insert(tick);
             cumulativeUpperVolume += tick.volume;
+            upperTicks.insert(tick);
         }
         else
         {
-            lowerTicks.insert(tick);
             cumulativeLowerVolume += tick.volume;
+            lowerTicks.insert(tick);
         }
         ticks.push(tick);
         cumulativeVolume += tick.volume;
@@ -106,24 +108,25 @@ public:
     {
         while (cumulativeLowerVolume < ((cumulativeVolume + 1) >> 1))
         {
-#if USE_SET_EXTRACT == 1
             auto upperTick = upperTicks.extract(upperTicks.begin());
+#if CUSTOM_SORTED_ARRAY == 1
+            cumulativeUpperVolume -= upperTick.volume;
+            cumulativeLowerVolume += upperTick.volume;
+#else
             cumulativeUpperVolume -= upperTick.value().volume;
             cumulativeLowerVolume += upperTick.value().volume;
-            lowerTicks.insert(std::move(upperTick));
-#else
-            auto upperTick = upperTicks.begin();
-            upperTicks.erase(upperTick);
-            cumulativeUpperVolume -= upperTick->volume;
-            lowerTicks.insert(*upperTick);
-            cumulativeLowerVolume += upperTick->volume;
 #endif
+            lowerTicks.insert(std::move(upperTick));
         }
     }
 
     FORCE_INLINE PriceType getMedian() const
     {
+#if CUSTOM_SORTED_ARRAY == 1
+        return lowerTicks.back().price;
+#else
         return std::prev(lowerTicks.end())->price;
+#endif
     }
 
     MedianCalculator(const MedianCalculator &) = delete;

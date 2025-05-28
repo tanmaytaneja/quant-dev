@@ -18,7 +18,7 @@ __forceinline Tick<PriceType> generateSyntheticTick(int currentTime)
 
 int main()
 {
-    constexpr int NUM_TICKS = 10;
+    constexpr int NUM_TICKS = 1'000'000;
 
     std::cout << "VW Median Calculator" << std::endl;
     int windowTime = DEFAULT_WINDOW_TIME;
@@ -34,9 +34,11 @@ int main()
     for (int currentTime = 0; currentTime < NUM_TICKS; ++currentTime)
     {
         Tick<double> syntheticTick = generateSyntheticTick<double>(currentTime);
-        medianCalculator.insertTick(syntheticTick);
 #if LOG == 1
         std::cout << "Current Tick: Price(" << syntheticTick.price << ") Volume (" << syntheticTick.volume << ") Timestamp (" << syntheticTick.timestamp << ")" << std::endl;
+#endif
+        medianCalculator.insertTick(syntheticTick);
+#if LOG == 1
         std::cout << "Current VW Median: " << medianCalculator.getMedian() << std::endl;
 #endif
     }
