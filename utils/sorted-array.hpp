@@ -1,7 +1,7 @@
 #ifndef SORTED_ARRAY_HPP
 #define SORTED_ARRAY_HPP
 
-#define EXTRACT 0
+#define EXTRACT 1
 
 #include <cstddef>
 
@@ -65,7 +65,7 @@ public:
         {
             return &data[pos];
         }
-        return nullptr;
+        return end();
     }
 
     const T *find(const T &value) const
@@ -75,7 +75,7 @@ public:
         {
             return &data[pos];
         }
-        return nullptr;
+        return end();
     }
 
 #if EXTRACT == 1
@@ -112,6 +112,16 @@ private:
             }
         }
         return low;
+    }
+
+    void print_set() const
+    {
+        std::cout << "{ ";
+        for(size_t i = 0; i < len; ++i)
+        {
+            std::cout << data[i] << ' ';
+        }
+        std::cout << "}" << std::endl;
     }
 };
 
