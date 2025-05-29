@@ -3,7 +3,7 @@
 #include <iostream>
 #include <x86intrin.h> //? For __rdtsc (works with GCC/Clang on x86/x64)
 
-#define DEFAULT_WINDOW_TIME 200
+#define DEFAULT_WINDOW_TIME 50
 #define DEFAULT_SIMULATION_TIME 50
 
 #define LOG 0

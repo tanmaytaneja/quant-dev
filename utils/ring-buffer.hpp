@@ -20,69 +20,76 @@ constexpr size_t next_power_of_two(size_t n)
     return n + 1;
 }
 
-template <typename T, size_t RequestedCapacity>
-class RingBuffer
+namespace TT
 {
-public:
-    RingBuffer() : head{0}, tail{0}, count{0}
+    template <typename T, size_t RequestedCapacity>
+    class RingBuffer
     {
-        static_assert((Capacity & Mask) == 0, "Capacity of RingBuffer must be a power of 2");
-    }
+    public:
+        RingBuffer() : head{0}, tail{0}, count{0}
+        {
+            static_assert((Capacity & Mask) == 0, "Capacity of RingBuffer must be a power of 2");
+        }
 
-    FORCE_INLINE bool empty() const
-    {
-        return !count;
-    }
+        FORCE_INLINE bool empty() const noexcept
+        {
+            return !count;
+        }
 
-    FORCE_INLINE bool full() const
-    {
-        return count == Capacity;
-    }
+        FORCE_INLINE bool full() const noexcept
+        {
+            return count == Capacity;
+        }
 
-    FORCE_INLINE size_t size() const
-    {
-        return count;
-    }
+        FORCE_INLINE size_t size() const noexcept
+        {
+            return count;
+        }
 
-    FORCE_INLINE void push(const T &item)
-    {
-        buffer[tail] = item;
-        tail = (tail + 1) & Mask;
-        ++count;
-    }
+        FORCE_INLINE void push(const T &item) noexcept
+        {
+            buffer[tail] = item;
+            tail = (tail + 1) & Mask;
+            ++count;
+        }
 
-    FORCE_INLINE void push(const T&& item)
-    {
-        buffer[tail] = std::move(item);
-        tail = (tail + 1) & Mask;
-        ++count;
-    }
+        FORCE_INLINE void push(const T &&item) noexcept
+        {
+            buffer[tail] = std::move(item);
+            tail = (tail + 1) & Mask;
+            ++count;
+        }
 
-    FORCE_INLINE void pop()
-    {
-        head = (head + 1) & Mask;
-        --count;
-    }
+        FORCE_INLINE void pop() noexcept
+        {
+            head = (head + 1) & Mask;
+            --count;
+        }
 
-    FORCE_INLINE T &front()
-    {
-        return buffer[head];
-    }
+        FORCE_INLINE T &front() noexcept
+        {
+            return buffer[head];
+        }
 
-    FORCE_INLINE const T &front() const
-    {
-        return buffer[head];
-    }
+        FORCE_INLINE const T &front() const noexcept
+        {
+            return buffer[head];
+        }
 
-private:
-    static constexpr size_t Capacity = next_power_of_two(RequestedCapacity);
-    static constexpr size_t Mask = Capacity - 1;
-    alignas(32) T buffer[Capacity];
-    size_t head;
-    size_t tail;
-    size_t count;
-};
+        FORCE_INLINE void clear() noexcept
+        {
+            head = tail = count = 0;
+        }
 
+    private:
+        static constexpr size_t Capacity = next_power_of_two(RequestedCapacity);
+        static constexpr size_t Mask = Capacity - 1;
+        alignas(32) T buffer[Capacity];
+        size_t head;
+        size_t tail;
+        size_t count;
+    };
+}
 #endif
 
 //* Instead of std::string, use char[N] or std::array<char, N> or custom SSO strings.

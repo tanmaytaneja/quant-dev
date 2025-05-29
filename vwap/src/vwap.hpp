@@ -66,7 +66,7 @@ private:
     double VWAPSum;
     int totalVolume;
 #if CUSTOM_RING_BUFFER == 1
-    RingBuffer<TickData<PriceType>, MAX_TICKS> tickWindow; //? Use this instead. This represents a ring-buffer. It offers us ZERO dynamic memory allocations, constant time push/pop and predictable memory layout.
+    TT::RingBuffer<TickData<PriceType>, MAX_TICKS> tickWindow; //? Use this instead. This represents a ring-buffer. It offers us ZERO dynamic memory allocations, constant time push/pop and predictable memory layout.
 #else
     std::queue<TickData<PriceType>> tickWindow; //! Never use std::queue in HFT since it is backed by std::deque, this causes dynamic allocations and non-contiguous memory.
 #endif

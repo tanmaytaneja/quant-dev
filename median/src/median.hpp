@@ -71,7 +71,7 @@ public:
         ticks.pop();
     }
 
-    //TODO: Add Templatized/Compile-Time Lazy Balancing Option (insert 10K ticks, getMedian once each second)
+    // TODO: Add Templatized/Compile-Time Lazy Balancing Option (insert 10K ticks, getMedian once each second)
     FORCE_INLINE void insertTick(const Tick<PriceType> &tick) noexcept
     {
         int currentTime = tick.timestamp;
@@ -140,10 +140,10 @@ private:
     int cumulativeUpperVolume;
     int cumulativeVolume;
     static constexpr size_t MAX_TICKS = 4096;
-    RingBuffer<Tick<PriceType>, MAX_TICKS> ticks;
+    TT::RingBuffer<Tick<PriceType>, MAX_TICKS> ticks;
 #if CUSTOM_SORTED_ARRAY == 1
-    SortedArray<Tick<PriceType>, MAX_TICKS> lowerTicks;
-    SortedArray<Tick<PriceType>, MAX_TICKS> upperTicks;
+    TT::SortedArray<Tick<PriceType>, MAX_TICKS> lowerTicks;
+    TT::SortedArray<Tick<PriceType>, MAX_TICKS> upperTicks;
 #else
     std::set<Tick<PriceType>> lowerTicks;
     std::set<Tick<PriceType>> upperTicks;
